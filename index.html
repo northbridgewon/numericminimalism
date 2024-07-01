@@ -1,15 +1,180 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>🟔</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="script.js"></script>
-</head>
-<body>
-    <div id="main"></div>
-    <canvas id="main"></canvas>
-    <div id="data">
-        <a href="https://1984.church/">🟔</a><br>
-        <audio controls autoplay preload src="-.mp3"></audio></div>
-</body>
-</html>
+<html><head><title>Synesthesia Experience</title>
+    <style>
+      body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: 'Arial', sans-serif;
+        background-color: #000;
+        color: #fff;
+        overflow: hidden;
+      }
+      
+      #canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      
+      #controls {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 20px;
+        border-radius: 10px;
+        z-index: 1000;
+      }
+      
+      button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        transition-duration: 0.4s;
+      }
+      
+      button:hover {
+        background-color: #45a049;
+      }
+      
+      #info {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 300px;
+      }
+      
+      a {
+        color: #4CAF50;
+        text-decoration: none;
+      }
+      
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+    </head>
+    <body>
+      <canvas id="canvas"></canvas>
+      
+      <div id="controls">
+        <button onclick="playSound('C')">C</button>
+        <button onclick="playSound('D')">D</button>
+        <button onclick="playSound('E')">E</button>
+        <button onclick="playSound('F')">F</button>
+        <button onclick="playSound('G')">G</button>
+        <button onclick="playSound('A')">A</button>
+        <button onclick="playSound('B')">B</button>
+      </div>
+    
+      <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        
+        function resize() {
+          width = window.innerWidth;
+          height = window.innerHeight;
+          canvas.width = width;
+          canvas.height = height;
+        }
+        
+        window.addEventListener('resize', resize);
+        resize();
+        
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        const frequencies = {
+          'C': 261.63,
+          'D': 293.66,
+          'E': 329.63,
+          'F': 349.23,
+          'G': 392.00,
+          'A': 440.00,
+          'B': 493.88
+        };
+        
+        const colors = {
+          'C': '#FF0000',
+          'D': '#FF7F00',
+          'E': '#FFFF00',
+          'F': '#00FF00',
+          'G': '#0000FF',
+          'A': '#4B0082',
+          'B': '#9400D3'
+        };
+        
+        function playSound(note) {
+          const oscillator = audioContext.createOscillator();
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(frequencies[note], audioContext.currentTime);
+          
+          const gainNode = audioContext.createGain();
+          gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+          
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + 1);
+          
+          visualize(note);
+        }
+        
+        function visualize(note) {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+          ctx.fillRect(0, 0, width, height);
+          
+          ctx.fillStyle = colors[note];
+          ctx.beginPath();
+          ctx.arc(width / 2, height / 2, 100, 0, Math.PI * 2);
+          ctx.fill();
+          
+          let startAngle = 0;
+          for (let i = 0; i < 8; i++) {
+            ctx.beginPath();
+            ctx.moveTo(width / 2, height / 2);
+            ctx.arc(width / 2, height / 2, 200, startAngle, startAngle + Math.PI / 4);
+            ctx.closePath();
+            ctx.fillStyle = `${colors[note]}${Math.floor(Math.random() * 16).toString(16)}`;
+            ctx.fill();
+            startAngle += Math.PI / 4;
+          }
+        }
+        
+        // Create ambient background animation
+        function animate() {
+          requestAnimationFrame(animate);
+          
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.01)';
+          ctx.fillRect(0, 0, width, height);
+          
+          for (let i = 0; i < 5; i++) {
+            ctx.beginPath();
+            ctx.arc(
+              Math.random() * width,
+              Math.random() * height,
+              Math.random() * 3,
+              0,
+              Math.PI * 2
+            );
+            ctx.fillStyle = `hsl(${Math.random() * 360}, 50%, 50%)`;
+            ctx.fill();
+          }
+        }
+        
+        animate();
+      </script>
+    </body></html>
